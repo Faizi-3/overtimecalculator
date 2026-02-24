@@ -126,7 +126,7 @@
 
     <!-- Main Calculator -->
     <div class="calculator">
-        <h2>Overtime Calculator (Days)</h2>
+        <h2>Overtime Calculator</h2>
 
         <label for="fullSalary">Full Monthly Salary (Rs.):</label>
         <input type="number" id="fullSalary" placeholder="Enter full salary" oninput="updateHourlyRate()">
