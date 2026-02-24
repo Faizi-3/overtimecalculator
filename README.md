@@ -23,7 +23,7 @@
         flex-wrap: wrap;
         gap: 20px;
         width: 100%;
-        max-width: 950px;
+        max-width: 1000px;
     }
 
     .calculator, .rates {
@@ -31,7 +31,7 @@
         border-radius: 20px;
         box-shadow: 0 15px 40px rgba(0,0,0,0.2);
         padding: 30px;
-        flex: 1 1 400px;
+        flex: 1 1 450px;
     }
 
     h2 {
@@ -165,6 +165,12 @@
         <label for="night_days">Night Allowance Days:</label>
         <input type="number" id="night_days" placeholder="Enter Night days">
 
+        <label for="sehri_days">Sehri Days:</label>
+        <input type="number" id="sehri_days" placeholder="Enter Sehri days">
+
+        <label for="aftari_days">Aftari Days:</label>
+        <input type="number" id="aftari_days" placeholder="Enter Aftari days">
+
         <button onclick="calculateOvertime()">Calculate Total Overtime Pay</button>
 
         <div class="result" id="result"></div>
@@ -182,6 +188,12 @@
 
         <label for="night_rate">Night Allowance Rate:</label>
         <input type="number" id="night_rate" placeholder="Enter Night rate">
+
+        <label for="sehri_rate">Sehri Rate:</label>
+        <input type="number" id="sehri_rate" placeholder="Enter Sehri rate">
+
+        <label for="aftari_rate">Aftari Rate:</label>
+        <input type="number" id="aftari_rate" placeholder="Enter Aftari rate">
     </div>
 
 </div>
@@ -193,7 +205,6 @@ function updateHourlyRate() {
     document.getElementById('rate').value = hourlyRate.toFixed(2);
 }
 
-// Remove highlight from all inputs
 function removeHighlight(input) {
     input.classList.remove('highlight');
 }
@@ -206,39 +217,28 @@ function calculateOvertime() {
     const ta_da_days = parseFloat(document.getElementById('ta_da_days').value) || 0;
     const evening_days = parseFloat(document.getElementById('evening_days').value) || 0;
     const night_days = parseFloat(document.getElementById('night_days').value) || 0;
+    const sehri_days = parseFloat(document.getElementById('sehri_days').value) || 0;
+    const aftari_days = parseFloat(document.getElementById('aftari_days').value) || 0;
 
     const ta_da_rate = parseFloat(document.getElementById('ta_da_rate').value) || 0;
     const evening_rate = parseFloat(document.getElementById('evening_rate').value) || 0;
     const night_rate = parseFloat(document.getElementById('night_rate').value) || 0;
+    const sehri_rate = parseFloat(document.getElementById('sehri_rate').value) || 0;
+    const aftari_rate = parseFloat(document.getElementById('aftari_rate').value) || 0;
 
     // Remove previous highlights
-    removeHighlight(document.getElementById('ta_da_rate'));
-    removeHighlight(document.getElementById('evening_rate'));
-    removeHighlight(document.getElementById('night_rate'));
+    ['ta_da_rate','evening_rate','night_rate','sehri_rate','aftari_rate'].forEach(id => removeHighlight(document.getElementById(id)));
 
-    // Validation with visual highlight only (no alert)
+    // Validation with visual highlight only
     let hasError = false;
 
-    if (ta_da_days > 0 && ta_da_rate <= 0) {
-        const input = document.getElementById('ta_da_rate');
-        input.classList.add('highlight');
-        input.focus();
-        hasError = true;
-    }
-    if (evening_days > 0 && evening_rate <= 0) {
-        const input = document.getElementById('evening_rate');
-        input.classList.add('highlight');
-        if (!hasError) input.focus();
-        hasError = true;
-    }
-    if (night_days > 0 && night_rate <= 0) {
-        const input = document.getElementById('night_rate');
-        input.classList.add('highlight');
-        if (!hasError) input.focus();
-        hasError = true;
-    }
+    if (ta_da_days > 0 && ta_da_rate <= 0) { document.getElementById('ta_da_rate').classList.add('highlight'); hasError=true; }
+    if (evening_days > 0 && evening_rate <= 0) { document.getElementById('evening_rate').classList.add('highlight'); if(!hasError) document.getElementById('evening_rate').focus(); hasError=true; }
+    if (night_days > 0 && night_rate <= 0) { document.getElementById('night_rate').classList.add('highlight'); if(!hasError) document.getElementById('night_rate').focus(); hasError=true; }
+    if (sehri_days > 0 && sehri_rate <= 0) { document.getElementById('sehri_rate').classList.add('highlight'); if(!hasError) document.getElementById('sehri_rate').focus(); hasError=true; }
+    if (aftari_days > 0 && aftari_rate <= 0) { document.getElementById('aftari_rate').classList.add('highlight'); if(!hasError) document.getElementById('aftari_rate').focus(); hasError=true; }
 
-    if (hasError) return; // Stop calculation until missing rates are filled
+    if (hasError) return; // Stop calculation
 
     const overtimePay1_5 = ot1_5 * rate * 1.5;
     const overtimePay2 = ot2 * rate * 2;
@@ -246,8 +246,10 @@ function calculateOvertime() {
     const ta_da = ta_da_days * ta_da_rate;
     const evening = evening_days * evening_rate;
     const night = night_days * night_rate;
+    const sehri = sehri_days * sehri_rate;
+    const aftari = aftari_days * aftari_rate;
 
-    const totalPay = overtimePay1_5 + overtimePay2 + ta_da + evening + night;
+    const totalPay = overtimePay1_5 + overtimePay2 + ta_da + evening + night + sehri + aftari;
 
     document.getElementById('result').innerHTML = `
         Overtime Pay (1.5×): Rs.${overtimePay1_5.toFixed(2)}<br>
@@ -255,6 +257,8 @@ function calculateOvertime() {
         TA/DA: Rs.${ta_da.toFixed(2)}<br>
         Evening Allowance: Rs.${evening.toFixed(2)}<br>
         Night Allowance: Rs.${night.toFixed(2)}<br>
+        Sehri: Rs.${sehri.toFixed(2)}<br>
+        Aftari: Rs.${aftari.toFixed(2)}<br>
         <strong>Total Overtime Pay: Rs.${totalPay.toFixed(2)}</strong>
     `;
 }
