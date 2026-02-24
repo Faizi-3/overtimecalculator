@@ -56,7 +56,7 @@
         border-radius: 10px;
         border: 1px solid #ccc;
         font-size: 16px;
-        transition: border 0.3s ease;
+        transition: border 0.3s ease, box-shadow 0.3s ease;
     }
 
     input:focus {
@@ -100,6 +100,22 @@
     .result strong {
         color: #1a237e;
         font-size: 18px;
+    }
+
+    /* Shake animation */
+    @keyframes shake {
+        0% { transform: translateX(0); }
+        20% { transform: translateX(-5px); }
+        40% { transform: translateX(5px); }
+        60% { transform: translateX(-5px); }
+        80% { transform: translateX(5px); }
+        100% { transform: translateX(0); }
+    }
+
+    .highlight {
+        border: 2px solid red !important;
+        box-shadow: 0 0 8px red;
+        animation: shake 0.5s;
     }
 
     /* Responsive */
@@ -177,20 +193,51 @@ function updateHourlyRate() {
     document.getElementById('rate').value = hourlyRate.toFixed(2);
 }
 
+// Remove highlight from all inputs
+function removeHighlight(input) {
+    input.classList.remove('highlight');
+}
+
 function calculateOvertime() {
     const rate = parseFloat(document.getElementById('rate').value) || 0;
     const ot1_5 = parseFloat(document.getElementById('ot1_5').value) || 0;
     const ot2 = parseFloat(document.getElementById('ot2').value) || 0;
 
-    // Days entered in main container
     const ta_da_days = parseFloat(document.getElementById('ta_da_days').value) || 0;
     const evening_days = parseFloat(document.getElementById('evening_days').value) || 0;
     const night_days = parseFloat(document.getElementById('night_days').value) || 0;
 
-    // Rates entered in side container
     const ta_da_rate = parseFloat(document.getElementById('ta_da_rate').value) || 0;
     const evening_rate = parseFloat(document.getElementById('evening_rate').value) || 0;
     const night_rate = parseFloat(document.getElementById('night_rate').value) || 0;
+
+    // Remove previous highlights
+    removeHighlight(document.getElementById('ta_da_rate'));
+    removeHighlight(document.getElementById('evening_rate'));
+    removeHighlight(document.getElementById('night_rate'));
+
+    // Validation with visual highlight
+    if (ta_da_days > 0 && ta_da_rate <= 0) {
+        const input = document.getElementById('ta_da_rate');
+        input.classList.add('highlight');
+        input.focus();
+        alert("Please enter TA/DA single day rate!");
+        return;
+    }
+    if (evening_days > 0 && evening_rate <= 0) {
+        const input = document.getElementById('evening_rate');
+        input.classList.add('highlight');
+        input.focus();
+        alert("Please enter Evening Allowance single day rate!");
+        return;
+    }
+    if (night_days > 0 && night_rate <= 0) {
+        const input = document.getElementById('night_rate');
+        input.classList.add('highlight');
+        input.focus();
+        alert("Please enter Night Allowance single day rate!");
+        return;
+    }
 
     const overtimePay1_5 = ot1_5 * rate * 1.5;
     const overtimePay2 = ot2 * rate * 2;
