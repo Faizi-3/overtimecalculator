@@ -7,6 +7,7 @@
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
+    /* Base styles */
     body {
         font-family: 'Roboto', sans-serif;
         background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
@@ -15,14 +16,16 @@
         align-items: center;
         min-height: 100vh;
         margin: 0;
+        padding: 10px;
     }
 
     .calculator {
         background: #fff;
-        padding: 40px 30px;
+        padding: 30px 25px;
         border-radius: 20px;
         box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-        width: 420px;
+        width: 100%;
+        max-width: 450px;
         transition: transform 0.3s ease;
     }
     .calculator:hover {
@@ -32,15 +35,16 @@
     h2 {
         text-align: center;
         color: #333;
-        margin-bottom: 30px;
-        font-size: 28px;
+        margin-bottom: 25px;
+        font-size: 26px;
     }
 
     label {
         display: block;
-        margin-top: 15px;
+        margin-top: 12px;
         font-weight: 700;
         color: #555;
+        font-size: 16px;
     }
 
     input {
@@ -58,7 +62,7 @@
     }
 
     button {
-        margin-top: 25px;
+        margin-top: 20px;
         width: 100%;
         padding: 14px;
         background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
@@ -77,26 +81,66 @@
     }
 
     .result {
-        margin-top: 25px;
-        font-size: 18px;
+        margin-top: 20px;
+        font-size: 16px;
         line-height: 1.6;
         color: #007bff;
         background: #f1f7ff;
-        padding: 20px;
+        padding: 18px;
         border-radius: 15px;
         text-align: center;
         box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        word-wrap: break-word;
     }
 
     .result strong {
         color: #1a237e;
-        font-size: 20px;
+        font-size: 18px;
+    }
+
+    /* Responsive Media Queries */
+    @media (max-width: 480px) {
+        .calculator {
+            padding: 25px 20px;
+        }
+        h2 {
+            font-size: 22px;
+        }
+        label, input {
+            font-size: 15px;
+        }
+        button {
+            font-size: 16px;
+            padding: 12px;
+        }
+        .result {
+            font-size: 15px;
+            padding: 15px;
+        }
+    }
+
+    @media (min-width: 481px) and (max-width: 768px) {
+        .calculator {
+            padding: 28px 22px;
+        }
+        h2 {
+            font-size: 24px;
+        }
+        label, input {
+            font-size: 16px;
+        }
+        button {
+            font-size: 17px;
+        }
+        .result {
+            font-size: 16px;
+        }
     }
 </style>
 </head>
 <body>
 <div class="calculator">
-    <h2>Overtime Calculator</h2>
+    <h2>Overtime Calculator (Rs.)</h2>
 
     <label for="fullSalary">Full Monthly Salary (Rs.):</label>
     <input type="number" id="fullSalary" placeholder="Enter full salary" oninput="updateHourlyRate()">
@@ -127,8 +171,7 @@
 <script>
 function updateHourlyRate() {
     const fullSalary = parseFloat(document.getElementById('fullSalary').value) || 0;
-    // Assuming 30 days * 8.5 hours/day
-    const hourlyRate = fullSalary / (30 * 8.5);
+    const hourlyRate = fullSalary / (30 * 8.5); // 30 days * 8.5 hours/day
     document.getElementById('rate').value = hourlyRate.toFixed(2);
 }
 
@@ -143,7 +186,6 @@ function calculateOvertime() {
     const overtimePay1_5 = ot1_5 * rate * 1.5;
     const overtimePay2 = ot2 * rate * 2;
 
-    // Total excludes regular monthly salary
     const totalPay = overtimePay1_5 + overtimePay2 + ta_da + evening + night;
 
     document.getElementById('result').innerHTML = `
