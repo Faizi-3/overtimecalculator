@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -118,7 +119,7 @@
     <label for="night">Night Allowance (Rs.):</label>
     <input type="number" id="night" placeholder="Enter Night Allowance">
 
-    <button onclick="calculateOvertime()">Calculate Total Pay</button>
+    <button onclick="calculateOvertime()">Calculate Total Overtime Pay</button>
 
     <div class="result" id="result"></div>
 </div>
@@ -126,6 +127,7 @@
 <script>
 function updateHourlyRate() {
     const fullSalary = parseFloat(document.getElementById('fullSalary').value) || 0;
+    // Assuming 30 days * 8.5 hours/day
     const hourlyRate = fullSalary / (30 * 8.5);
     document.getElementById('rate').value = hourlyRate.toFixed(2);
 }
@@ -138,23 +140,19 @@ function calculateOvertime() {
     const evening = parseFloat(document.getElementById('evening').value) || 0;
     const night = parseFloat(document.getElementById('night').value) || 0;
 
-    // Regular pay is automatically 8.5*30 hours
-    const regularHours = 30 * 8.5;
-    const regularPay = regularHours * rate;
-
     const overtimePay1_5 = ot1_5 * rate * 1.5;
     const overtimePay2 = ot2 * rate * 2;
 
-    const totalPay = regularPay + overtimePay1_5 + overtimePay2 + ta_da + evening + night;
+    // Total excludes regular monthly salary
+    const totalPay = overtimePay1_5 + overtimePay2 + ta_da + evening + night;
 
     document.getElementById('result').innerHTML = `
-        Regular Pay: Rs.${regularPay.toFixed(2)}<br>
         Overtime Pay (1.5×): Rs.${overtimePay1_5.toFixed(2)}<br>
         Overtime Pay (2×): Rs.${overtimePay2.toFixed(2)}<br>
         TA/DA: Rs.${ta_da.toFixed(2)}<br>
         Evening Allowance: Rs.${evening.toFixed(2)}<br>
         Night Allowance: Rs.${night.toFixed(2)}<br>
-        <strong>Total Pay: Rs.${totalPay.toFixed(2)}</strong>
+        <strong>Total Overtime Pay: Rs.${totalPay.toFixed(2)}</strong>
     `;
 }
 </script>
