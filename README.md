@@ -216,28 +216,29 @@ function calculateOvertime() {
     removeHighlight(document.getElementById('evening_rate'));
     removeHighlight(document.getElementById('night_rate'));
 
-    // Validation with visual highlight
+    // Validation with visual highlight only (no alert)
+    let hasError = false;
+
     if (ta_da_days > 0 && ta_da_rate <= 0) {
         const input = document.getElementById('ta_da_rate');
         input.classList.add('highlight');
         input.focus();
-        alert("Please enter TA/DA single day rate!");
-        return;
+        hasError = true;
     }
     if (evening_days > 0 && evening_rate <= 0) {
         const input = document.getElementById('evening_rate');
         input.classList.add('highlight');
-        input.focus();
-        alert("Please enter Evening Allowance single day rate!");
-        return;
+        if (!hasError) input.focus();
+        hasError = true;
     }
     if (night_days > 0 && night_rate <= 0) {
         const input = document.getElementById('night_rate');
         input.classList.add('highlight');
-        input.focus();
-        alert("Please enter Night Allowance single day rate!");
-        return;
+        if (!hasError) input.focus();
+        hasError = true;
     }
+
+    if (hasError) return; // Stop calculation until missing rates are filled
 
     const overtimePay1_5 = ot1_5 * rate * 1.5;
     const overtimePay2 = ot2 * rate * 2;
