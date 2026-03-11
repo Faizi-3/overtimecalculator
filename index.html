@@ -3,266 +3,755 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Overtime Calculator</title>
+<title>Overtime &amp; Time Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+:root {
+  --bg:        #f0f4ff;
+  --surface:   #ffffff;
+  --card:      #ffffff;
+  --border:    #e2e8f7;
+  --border2:   #c7d3f0;
 
-    body {
-        font-family: 'Roboto', sans-serif;
-        background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        min-height: 100vh;
-        margin: 0;
-        padding: 20px;
-    }
+  --teal:      #0d9488;
+  --teal-lt:   #ccfbf1;
+  --teal-mid:  #5eead4;
+  --blue:      #2563eb;
+  --blue-lt:   #dbeafe;
+  --indigo:    #4f46e5;
+  --indigo-lt: #e0e7ff;
+  --amber:     #d97706;
+  --amber-lt:  #fef3c7;
+  --rose:      #e11d48;
+  --rose-lt:   #ffe4e6;
+  --emerald:   #059669;
+  --emerald-lt:#d1fae5;
 
-    .calculator-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        width: 100%;
-        max-width: 1000px;
-    }
+  --text:      #1e293b;
+  --text2:     #475569;
+  --muted:     #94a3b8;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.05);
+  --shadow-xl: 0 24px 64px rgba(0,0,0,0.12), 0 8px 20px rgba(0,0,0,0.06);
+  --radius:    20px;
+  --radius-sm: 12px;
+  --radius-xs: 8px;
+}
 
-    .calculator, .rates {
-        background: #fff;
-        border-radius: 20px;
-        box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-        padding: 30px;
-        flex: 1 1 450px;
-    }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 
-    h2 {
-        text-align: center;
-        color: #333;
-        margin-bottom: 20px;
-        font-size: 24px;
-    }
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
 
-    label {
-        display: block;
-        margin-top: 12px;
-        font-weight: 700;
-        color: #555;
-        font-size: 16px;
-    }
+/* ── Decorative background shapes ── */
+body::before, body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+body::before {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(13,148,136,0.1) 0%, transparent 70%);
+  top: -200px; right: -150px;
+  animation: float1 18s ease-in-out infinite alternate;
+}
+body::after {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(79,70,229,0.09) 0%, transparent 70%);
+  bottom: -100px; left: -120px;
+  animation: float2 22s ease-in-out infinite alternate;
+}
 
-    input {
-        width: 100%;
-        padding: 10px;
-        margin-top: 5px;
-        border-radius: 10px;
-        border: 1px solid #ccc;
-        font-size: 16px;
-        transition: border 0.3s ease, box-shadow 0.3s ease;
-    }
+@keyframes float1 { 0% { transform: translate(0,0); } 100% { transform: translate(-40px, 60px); } }
+@keyframes float2 { 0% { transform: translate(0,0); } 100% { transform: translate(50px, -40px); } }
 
-    input:focus {
-        border: 2px solid #007bff;
-        outline: none;
-    }
+/* ── Page wrapper ── */
+.page {
+  position: relative; z-index: 1;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 20px 80px;
+}
 
-    button {
-        margin-top: 20px;
-        width: 100%;
-        padding: 14px;
-        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-        color: white;
-        font-size: 18px;
-        font-weight: bold;
-        border: none;
-        border-radius: 12px;
-        cursor: pointer;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-        transition: background 0.3s ease, transform 0.2s ease;
-    }
+/* ── Header ── */
+.site-header {
+  text-align: center;
+  padding: 56px 20px 52px;
+  animation: fadeDown 0.7s ease both;
+}
 
-    button:hover {
-        background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
-        transform: translateY(-3px);
-    }
+.header-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: white;
+  border: 1px solid var(--border2);
+  border-radius: 100px;
+  padding: 6px 18px 6px 10px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+}
+.header-pill .dot {
+  width: 8px; height: 8px;
+  background: var(--teal);
+  border-radius: 50%;
+  animation: pulse 2s ease infinite;
+}
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(13,148,136,0.4); }
+  50%      { box-shadow: 0 0 0 6px rgba(13,148,136,0); }
+}
+.header-pill span {
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--teal);
+}
 
-    .result {
-        margin-top: 20px;
-        font-size: 16px;
-        line-height: 1.6;
-        color: #007bff;
-        background: #f1f7ff;
-        padding: 18px;
-        border-radius: 15px;
-        text-align: center;
-        box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
-        word-wrap: break-word;
-    }
+.site-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 5vw, 56px);
+  font-weight: 900; line-height: 1.1;
+  color: var(--text);
+  letter-spacing: -1px;
+}
+.site-header h1 em {
+  font-style: italic;
+  background: linear-gradient(135deg, var(--teal), var(--indigo));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-    .result strong {
-        color: #1a237e;
-        font-size: 18px;
-    }
+.site-header p {
+  margin-top: 16px; font-size: 16px;
+  color: var(--text2); font-weight: 300;
+  max-width: 480px; margin-left: auto; margin-right: auto;
+  line-height: 1.6;
+}
 
-    /* Shake animation */
-    @keyframes shake {
-        0% { transform: translateX(0); }
-        20% { transform: translateX(-5px); }
-        40% { transform: translateX(5px); }
-        60% { transform: translateX(-5px); }
-        80% { transform: translateX(5px); }
-        100% { transform: translateX(0); }
-    }
+/* ── Section labels ── */
+.sec-label {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 8px;
+}
+.sec-label .pill {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  padding: 4px 14px; border-radius: 100px;
+}
+.pill-teal  { background: var(--teal-lt);   color: var(--teal); }
+.pill-blue  { background: var(--blue-lt);   color: var(--blue); }
+.pill-amber { background: var(--amber-lt);  color: var(--amber); }
+.pill-indigo{ background: var(--indigo-lt); color: var(--indigo); }
 
-    .highlight {
-        border: 2px solid red !important;
-        box-shadow: 0 0 8px red;
-        animation: shake 0.5s;
-    }
+.sec-label .line { flex: 1; height: 1px; background: var(--border); }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-        .calculator-container {
-            flex-direction: column;
-            gap: 15px;
-        }
-        h2 {
-            font-size: 22px;
-        }
-        input, label, button {
-            font-size: 15px;
-        }
-        .result {
-            font-size: 15px;
-        }
-    }
+.sec-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(18px, 3vw, 26px);
+  font-weight: 700; color: var(--text);
+  margin-bottom: 20px; letter-spacing: -0.3px;
+}
+
+/* ── Cards ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow: var(--shadow-md);
+  position: relative; overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: fadeUp 0.6s ease both;
+}
+.card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.card.t-teal::before   { background: linear-gradient(90deg, var(--teal), var(--teal-mid)); }
+.card.t-blue::before   { background: linear-gradient(90deg, var(--blue), var(--indigo)); }
+.card.t-amber::before  { background: linear-gradient(90deg, var(--amber), #f59e0b); }
+.card.t-indigo::before { background: linear-gradient(90deg, var(--indigo), var(--blue)); }
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+}
+
+/* ── Grids ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.grid-half { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.col-full { grid-column: 1/-1; }
+.gap-section { height: 48px; }
+
+/* ── Form fields ── */
+.field { margin-bottom: 18px; }
+.field:last-child { margin-bottom: 0; }
+
+.field label {
+  display: block;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.8px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 7px;
+  transition: color 0.2s;
+}
+.field:focus-within label { color: var(--teal); }
+
+.field input {
+  width: 100%;
+  background: #f8faff;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px; font-weight: 500;
+  transition: all 0.22s ease;
+  outline: none;
+  appearance: none;
+}
+.field input::placeholder { color: var(--muted); font-weight: 400; }
+.field input:focus {
+  border-color: var(--teal);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(13,148,136,0.1);
+}
+.field input[readonly] {
+  background: var(--teal-lt);
+  border-color: var(--teal-mid);
+  color: var(--teal);
+  font-weight: 700; cursor: default;
+}
+.field input[type="datetime-local"] { color-scheme: light; cursor: pointer; }
+.field input.error {
+  border-color: var(--rose) !important;
+  background: var(--rose-lt) !important;
+  box-shadow: 0 0 0 4px rgba(225,29,72,0.1) !important;
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%,60%  { transform: translateX(-4px); }
+  40%,80%  { transform: translateX(4px); }
+}
+
+/* ── Buttons ── */
+.btn {
+  display: block; width: 100%;
+  padding: 14px 24px;
+  border: none; border-radius: var(--radius-sm);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px; font-weight: 700; letter-spacing: 0.3px;
+  cursor: pointer; position: relative; overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s;
+  text-align: center;
+}
+.btn:active { transform: scale(0.98) !important; }
+.btn::after {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(255,255,255,0); transition: background 0.2s;
+}
+.btn:hover::after { background: rgba(255,255,255,0.12); }
+
+.btn-teal {
+  background: linear-gradient(135deg, #0d9488, #0f766e);
+  color: white; box-shadow: 0 6px 20px rgba(13,148,136,0.35);
+}
+.btn-teal:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(13,148,136,0.45); }
+
+.btn-blue {
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  color: white; box-shadow: 0 6px 20px rgba(37,99,235,0.3);
+}
+.btn-blue:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(37,99,235,0.4); }
+
+.btn-emerald {
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: white; box-shadow: 0 6px 20px rgba(5,150,105,0.32);
+}
+.btn-emerald:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(5,150,105,0.42); }
+
+.btn-outline {
+  background: white; color: var(--text2);
+  border: 1.5px solid var(--border2);
+  box-shadow: var(--shadow-sm);
+}
+.btn-outline:hover { background: var(--bg); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+.btn-remove {
+  width: auto; padding: 9px 16px;
+  background: var(--rose-lt);
+  border: 1.5px solid #fecdd3;
+  color: var(--rose); border-radius: var(--radius-xs);
+  font-size: 12px; font-weight: 700; letter-spacing: 0.3px;
+  align-self: flex-end;
+}
+.btn-remove:hover { background: #ffe4e6; transform: scale(1.04); box-shadow: none; }
+
+.btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
+.btn-row .btn { flex: 1; min-width: 130px; }
+
+/* ── Result box ── */
+.result-box {
+  margin-top: 22px;
+  background: linear-gradient(135deg, #f0fdf4, #f0f9ff);
+  border: 1.5px solid #bbf7d0;
+  border-radius: var(--radius-sm); padding: 24px;
+  display: none;
+}
+.result-box.visible {
+  display: block;
+  animation: expandIn 0.4s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes expandIn {
+  from { opacity: 0; transform: scaleY(0.85); transform-origin: top; }
+  to   { opacity: 1; transform: scaleY(1); }
+}
+
+.result-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  font-size: 14px;
+  animation: slideIn 0.3s ease both;
+}
+.result-row:last-of-type { border-bottom: none; }
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.result-row .lbl { color: var(--text2); font-weight: 400; }
+.result-row .val { font-weight: 600; color: var(--text); }
+
+.result-total {
+  margin-top: 16px; padding: 18px 20px;
+  background: linear-gradient(135deg, var(--teal), #0f766e);
+  border-radius: var(--radius-xs);
+  display: flex; justify-content: space-between; align-items: center;
+  box-shadow: 0 8px 24px rgba(13,148,136,0.3);
+}
+.result-total .tlbl {
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.75);
+}
+.result-total .tval {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 700; color: white;
+}
+
+/* ── Time calculator ── */
+#timeEntries { display: flex; flex-direction: column; gap: 12px; margin-bottom: 4px; }
+
+.time-entry {
+  background: #f8faff;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); padding: 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 14px; align-items: end;
+  transition: border-color 0.22s, box-shadow 0.22s;
+  animation: slideIn 0.3s ease both;
+}
+.time-entry:hover {
+  border-color: var(--teal-mid);
+  box-shadow: 0 4px 16px rgba(13,148,136,0.1);
+}
+.entry-num {
+  grid-column: 1/-1;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--teal); margin-bottom: -6px;
+}
+
+/* Time result hero */
+.time-hero {
+  text-align: center;
+  padding: 24px 0 16px;
+}
+.time-hero .big-num {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(38px, 8vw, 66px);
+  font-weight: 900; line-height: 1;
+  background: linear-gradient(135deg, var(--teal), var(--indigo));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: numPop 0.5s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes numPop {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.time-hero .sub { font-size: 13px; color: var(--text2); margin-top: 8px; }
+.time-hero .sub strong { color: var(--teal); font-weight: 700; }
+
+.breakdown-list { margin-top: 16px; display: flex; flex-direction: column; gap: 7px; }
+.breakdown-item {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 13px; padding: 9px 14px;
+  background: white; border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  animation: slideIn 0.3s ease both;
+  transition: background 0.2s;
+}
+.breakdown-item:hover { background: var(--teal-lt); border-color: var(--teal-mid); }
+.breakdown-item .bl { color: var(--text2); }
+.breakdown-item .bv { color: var(--teal); font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+/* Rates header chip */
+.rates-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--amber-lt); border: 1px solid #fcd34d;
+  border-radius: 100px; padding: 5px 14px;
+  margin-bottom: 22px;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--amber);
+}
+
+/* Floating decorative shapes inside cards */
+.card-deco {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none; z-index: 0;
+  opacity: 0.06;
+}
+.card-deco-1 { width: 160px; height: 160px; background: var(--teal); top: -40px; right: -40px; }
+.card-deco-2 { width: 120px; height: 120px; background: var(--indigo); bottom: -30px; left: -30px; }
+.card-deco-3 { width: 140px; height: 140px; background: var(--amber); bottom: -30px; right: -30px; }
+.card > * { position: relative; z-index: 1; }
+
+/* ── Page load animations ── */
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.card:nth-child(1) { animation-delay: 0.05s; }
+.card:nth-child(2) { animation-delay: 0.12s; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .grid-2 { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .grid-half { grid-template-columns: 1fr; }
+  .time-entry { grid-template-columns: 1fr; }
+  .btn-row { flex-direction: column; }
+  .card { padding: 22px 18px; }
+  .page { padding: 0 14px 60px; }
+  .site-header { padding: 36px 14px 38px; }
+  .result-total { flex-direction: column; gap: 6px; text-align: center; }
+  .result-total .tval { font-size: 20px; }
+}
+@media (max-width: 400px) {
+  .card { padding: 18px 14px; }
+  .site-header h1 { font-size: 24px; }
+  .field input { padding: 11px 12px; font-size: 14px; }
+}
 </style>
 </head>
 <body>
 
-<div class="calculator-container">
+<div class="page">
 
-    <!-- Main Calculator -->
-    <div class="calculator">
-        <h2>Overtime Calculator</h2>
+  <!-- ── Header ── -->
+  <header class="site-header">
+    <div class="header-pill">
+      <div class="dot"></div>
+      <span>Professional Tool</span>
+    </div>
+    <h1>Overtime &amp; <em>Time</em> Calculator</h1>
+    <p>Track work hours, calculate overtime pay, and manage all allowances — accurate and effortless.</p>
+  </header>
 
-        <label for="fullSalary">Full Monthly Salary (Rs.):</label>
-        <input type="number" id="fullSalary" placeholder="Enter full salary" oninput="updateHourlyRate()">
+  <!-- ══════════ TIME CALCULATOR ══════════ -->
+  <div class="sec-label">
+    <span class="pill pill-teal">Time Calculator</span>
+    <div class="line"></div>
+  </div>
+  <div class="sec-title">Calculate Total Hours</div>
 
-        <label for="rate">Hourly Rate (Rs.):</label>
-        <input type="number" id="rate" placeholder="Calculated hourly rate" readonly>
+  <div class="card t-teal" style="margin-bottom: 0;">
+    <div class="card-deco card-deco-1"></div>
+    <div class="card-deco card-deco-2"></div>
 
-        <label for="ot1_5">Overtime Hours (x1.5):</label>
-        <input type="number" id="ot1_5" placeholder="Enter OT hours 1.5×">
+    <div id="timeEntries"></div>
 
-        <label for="ot2">Overtime Hours (x2):</label>
-        <input type="number" id="ot2" placeholder="Enter OT hours 2×">
-
-        <label for="ta_da_days">TA/DA Days:</label>
-        <input type="number" id="ta_da_days" placeholder="Enter TA/DA days">
-
-        <label for="evening_days">Evening Allowance Days:</label>
-        <input type="number" id="evening_days" placeholder="Enter Evening days">
-
-        <label for="night_days">Night Allowance Days:</label>
-        <input type="number" id="night_days" placeholder="Enter Night days">
-
-        <label for="sehri_days">Sehri Days:</label>
-        <input type="number" id="sehri_days" placeholder="Enter Sehri days">
-
-        <label for="aftari_days">Aftari Days:</label>
-        <input type="number" id="aftari_days" placeholder="Enter Aftari days">
-
-        <button onclick="calculateOvertime()">Calculate Total Overtime Pay</button>
-
-        <div class="result" id="result"></div>
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="addTimeEntry()">+ Add Entry</button>
+      <button class="btn btn-teal" onclick="calculateTotalHours()">Calculate Hours</button>
     </div>
 
-    <!-- Rates Container -->
-    <div class="rates">
-        <h2>Single Rates (Rs.)</h2>
+    <div class="result-box" id="timeResult"></div>
+  </div>
 
-        <label for="ta_da_rate">TA/DA Rate:</label>
-        <input type="number" id="ta_da_rate" placeholder="Enter TA/DA rate">
+  <div class="gap-section"></div>
 
-        <label for="evening_rate">Evening Allowance Rate:</label>
-        <input type="number" id="evening_rate" placeholder="Enter Evening rate">
+  <!-- ══════════ OVERTIME CALCULATOR ══════════ -->
+  <div class="sec-label">
+    <span class="pill pill-blue">Overtime Calculator</span>
+    <div class="line"></div>
+  </div>
+  <div class="sec-title">Calculate Overtime Pay</div>
 
-        <label for="night_rate">Night Allowance Rate:</label>
-        <input type="number" id="night_rate" placeholder="Enter Night rate">
+  <div class="grid-2" style="margin-bottom: 0;">
 
-        <label for="sehri_rate">Sehri Rate:</label>
-        <input type="number" id="sehri_rate" placeholder="Enter Sehri rate">
+    <!-- Left: Inputs -->
+    <div class="card t-indigo">
+      <div class="card-deco card-deco-1" style="background:var(--indigo);"></div>
 
-        <label for="aftari_rate">Aftari Rate:</label>
-        <input type="number" id="aftari_rate" placeholder="Enter Aftari rate">
+      <div class="field">
+        <label>Full Monthly Salary (Rs.)</label>
+        <input type="number" id="fullSalary" placeholder="e.g. 80,000" oninput="updateHourlyRate()">
+      </div>
+      <div class="field">
+        <label>Hourly Rate (Rs.) — auto calculated</label>
+        <input type="number" id="rate" placeholder="Calculated from salary" readonly>
+      </div>
+      <div class="grid-half">
+        <div class="field">
+          <label>OT Hours (x 1.5)</label>
+          <input type="number" id="ot1_5" placeholder="e.g. 10">
+        </div>
+        <div class="field">
+          <label>OT Hours (x 2.0)</label>
+          <input type="number" id="ot2" placeholder="e.g. 5">
+        </div>
+        <div class="field">
+          <label>TA / DA Days</label>
+          <input type="number" id="ta_da_days" placeholder="Days">
+        </div>
+        <div class="field">
+          <label>Evening Allowance Days</label>
+          <input type="number" id="evening_days" placeholder="Days">
+        </div>
+        <div class="field">
+          <label>Night Allowance Days</label>
+          <input type="number" id="night_days" placeholder="Days">
+        </div>
+        <div class="field">
+          <label>Sehri Days</label>
+          <input type="number" id="sehri_days" placeholder="Days">
+        </div>
+        <div class="field col-full">
+          <label>Aftari Days</label>
+          <input type="number" id="aftari_days" placeholder="Days">
+        </div>
+      </div>
     </div>
 
-</div>
+    <!-- Right: Rates -->
+    <div class="card t-amber">
+      <div class="card-deco card-deco-3"></div>
+      <div class="rates-chip">Single Rates (Rs.)</div>
+      <div class="field">
+        <label>TA / DA Rate</label>
+        <input type="number" id="ta_da_rate" placeholder="Rate per day">
+      </div>
+      <div class="field">
+        <label>Evening Allowance Rate</label>
+        <input type="number" id="evening_rate" placeholder="Rate per day">
+      </div>
+      <div class="field">
+        <label>Night Allowance Rate</label>
+        <input type="number" id="night_rate" placeholder="Rate per day">
+      </div>
+      <div class="field">
+        <label>Sehri Rate</label>
+        <input type="number" id="sehri_rate" placeholder="Rate per day">
+      </div>
+      <div class="field">
+        <label>Aftari Rate</label>
+        <input type="number" id="aftari_rate" placeholder="Rate per day">
+      </div>
+    </div>
+
+  </div>
+
+  <button class="btn btn-emerald" style="margin-top:20px;" onclick="calculateOvertime()">
+    Calculate Total Overtime Pay
+  </button>
+
+  <div class="result-box" id="otResult" style="border-color: #bbf7d0;"></div>
+
+</div><!-- /page -->
 
 <script>
+/* ─── Overtime ─── */
 function updateHourlyRate() {
-    const fullSalary = parseFloat(document.getElementById('fullSalary').value) || 0;
-    const hourlyRate = fullSalary / (30 * 8.5); // 30 days * 8.5 hours/day
-    document.getElementById('rate').value = hourlyRate.toFixed(2);
+  const sal = parseFloat(document.getElementById('fullSalary').value) || 0;
+  document.getElementById('rate').value = sal ? (sal / (30 * 8.5)).toFixed(2) : '';
 }
 
-function removeHighlight(input) {
-    input.classList.remove('highlight');
-}
+function clearErr(...ids) { ids.forEach(id => document.getElementById(id)?.classList.remove('error')); }
 
 function calculateOvertime() {
-    const rate = parseFloat(document.getElementById('rate').value) || 0;
-    const ot1_5 = parseFloat(document.getElementById('ot1_5').value) || 0;
-    const ot2 = parseFloat(document.getElementById('ot2').value) || 0;
+  const g = id => parseFloat(document.getElementById(id).value) || 0;
+  const rate         = g('rate');
+  const ot1_5        = g('ot1_5');
+  const ot2          = g('ot2');
+  const ta_da_days   = g('ta_da_days');
+  const evening_days = g('evening_days');
+  const night_days   = g('night_days');
+  const sehri_days   = g('sehri_days');
+  const aftari_days  = g('aftari_days');
+  const ta_da_rate   = g('ta_da_rate');
+  const evening_rate = g('evening_rate');
+  const night_rate   = g('night_rate');
+  const sehri_rate   = g('sehri_rate');
+  const aftari_rate  = g('aftari_rate');
 
-    const ta_da_days = parseFloat(document.getElementById('ta_da_days').value) || 0;
-    const evening_days = parseFloat(document.getElementById('evening_days').value) || 0;
-    const night_days = parseFloat(document.getElementById('night_days').value) || 0;
-    const sehri_days = parseFloat(document.getElementById('sehri_days').value) || 0;
-    const aftari_days = parseFloat(document.getElementById('aftari_days').value) || 0;
+  clearErr('ta_da_rate','evening_rate','night_rate','sehri_rate','aftari_rate');
 
-    const ta_da_rate = parseFloat(document.getElementById('ta_da_rate').value) || 0;
-    const evening_rate = parseFloat(document.getElementById('evening_rate').value) || 0;
-    const night_rate = parseFloat(document.getElementById('night_rate').value) || 0;
-    const sehri_rate = parseFloat(document.getElementById('sehri_rate').value) || 0;
-    const aftari_rate = parseFloat(document.getElementById('aftari_rate').value) || 0;
+  let err = false;
+  const chk = (days, rId) => {
+    if (days > 0 && (parseFloat(document.getElementById(rId).value)||0) <= 0) {
+      document.getElementById(rId).classList.add('error'); err = true;
+    }
+  };
+  chk(ta_da_days,'ta_da_rate'); chk(evening_days,'evening_rate');
+  chk(night_days,'night_rate'); chk(sehri_days,'sehri_rate');
+  chk(aftari_days,'aftari_rate');
+  if (err) return;
 
-    // Remove previous highlights
-    ['ta_da_rate','evening_rate','night_rate','sehri_rate','aftari_rate'].forEach(id => removeHighlight(document.getElementById(id)));
+  const fmt = v => 'Rs. ' + v.toLocaleString('en-PK',{minimumFractionDigits:2, maximumFractionDigits:2});
 
-    // Validation with visual highlight only
-    let hasError = false;
+  const pay1_5  = ot1_5 * rate * 1.5;
+  const pay2    = ot2   * rate * 2;
+  const ta_da   = ta_da_days   * ta_da_rate;
+  const evening = evening_days * evening_rate;
+  const night   = night_days   * night_rate;
+  const sehri   = sehri_days   * sehri_rate;
+  const aftari  = aftari_days  * aftari_rate;
+  const total   = pay1_5 + pay2 + ta_da + evening + night + sehri + aftari;
 
-    if (ta_da_days > 0 && ta_da_rate <= 0) { document.getElementById('ta_da_rate').classList.add('highlight'); hasError=true; }
-    if (evening_days > 0 && evening_rate <= 0) { document.getElementById('evening_rate').classList.add('highlight'); if(!hasError) document.getElementById('evening_rate').focus(); hasError=true; }
-    if (night_days > 0 && night_rate <= 0) { document.getElementById('night_rate').classList.add('highlight'); if(!hasError) document.getElementById('night_rate').focus(); hasError=true; }
-    if (sehri_days > 0 && sehri_rate <= 0) { document.getElementById('sehri_rate').classList.add('highlight'); if(!hasError) document.getElementById('sehri_rate').focus(); hasError=true; }
-    if (aftari_days > 0 && aftari_rate <= 0) { document.getElementById('aftari_rate').classList.add('highlight'); if(!hasError) document.getElementById('aftari_rate').focus(); hasError=true; }
+  const rows = [
+    ['Overtime Pay (1.5x)', pay1_5],
+    ['Overtime Pay (2.0x)', pay2],
+    ['TA / DA',             ta_da],
+    ['Evening Allowance',   evening],
+    ['Night Allowance',     night],
+    ['Sehri',               sehri],
+    ['Aftari',              aftari],
+  ];
 
-    if (hasError) return; // Stop calculation
+  let html = rows.map((r,i) => `
+    <div class="result-row" style="animation-delay:${i*0.05}s">
+      <span class="lbl">${r[0]}</span>
+      <span class="val">${fmt(r[1])}</span>
+    </div>`).join('');
 
-    const overtimePay1_5 = ot1_5 * rate * 1.5;
-    const overtimePay2 = ot2 * rate * 2;
+  html += `
+    <div class="result-total" style="animation-delay:${rows.length*0.05}s">
+      <span class="tlbl">Total Overtime Pay</span>
+      <span class="tval">${fmt(total)}</span>
+    </div>`;
 
-    const ta_da = ta_da_days * ta_da_rate;
-    const evening = evening_days * evening_rate;
-    const night = night_days * night_rate;
-    const sehri = sehri_days * sehri_rate;
-    const aftari = aftari_days * aftari_rate;
-
-    const totalPay = overtimePay1_5 + overtimePay2 + ta_da + evening + night + sehri + aftari;
-
-    document.getElementById('result').innerHTML = `
-        Overtime Pay (1.5×): Rs.${overtimePay1_5.toFixed(2)}<br>
-        Overtime Pay (2×): Rs.${overtimePay2.toFixed(2)}<br>
-        TA/DA: Rs.${ta_da.toFixed(2)}<br>
-        Evening Allowance: Rs.${evening.toFixed(2)}<br>
-        Night Allowance: Rs.${night.toFixed(2)}<br>
-        Sehri: Rs.${sehri.toFixed(2)}<br>
-        Aftari: Rs.${aftari.toFixed(2)}<br>
-        <strong>Total Overtime Pay: Rs.${totalPay.toFixed(2)}</strong>
-    `;
+  const box = document.getElementById('otResult');
+  box.innerHTML = html;
+  box.classList.remove('visible');
+  void box.offsetWidth;
+  box.classList.add('visible');
+  box.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
-</script>
 
+/* ─── Time Calculator ─── */
+let entryCount = 0;
+
+function addTimeEntry() {
+  entryCount++;
+  const n = entryCount;
+  const div = document.createElement('div');
+  div.className = 'time-entry';
+  div.id = `te_${n}`;
+  div.innerHTML = `
+    <div class="entry-num">Entry ${n}</div>
+    <div class="field" style="margin-bottom:0">
+      <label>Start Date &amp; Time</label>
+      <input type="datetime-local" id="start_${n}">
+    </div>
+    <div class="field" style="margin-bottom:0">
+      <label>End Date &amp; Time</label>
+      <input type="datetime-local" id="end_${n}">
+    </div>
+    <button class="btn btn-remove" onclick="removeEntry(${n})">Remove</button>
+  `;
+  document.getElementById('timeEntries').appendChild(div);
+}
+
+function removeEntry(n) {
+  const el = document.getElementById(`te_${n}`);
+  if (!el) return;
+  el.style.opacity = '0';
+  el.style.transform = 'scaleY(0.7)';
+  el.style.transformOrigin = 'top';
+  el.style.transition = 'all 0.25s ease';
+  setTimeout(() => el.remove(), 240);
+}
+
+function calculateTotalHours() {
+  const entries = document.querySelectorAll('.time-entry');
+  if (!entries.length) { addTimeEntry(); return; }
+
+  let totalMins = 0, bHtml = '', hasErr = false;
+
+  entries.forEach((row, idx) => {
+    const id  = row.id.replace('te_','');
+    const sEl = document.getElementById(`start_${id}`);
+    const eEl = document.getElementById(`end_${id}`);
+    sEl.classList.remove('error'); eEl.classList.remove('error');
+
+    if (!sEl.value || !eEl.value) {
+      sEl.classList.add('error'); eEl.classList.add('error');
+      hasErr = true; return;
+    }
+    const s = new Date(sEl.value), e = new Date(eEl.value);
+    if (e <= s) { eEl.classList.add('error'); hasErr = true; return; }
+
+    const mins = Math.floor((e - s) / 60000);
+    totalMins += mins;
+    const h = Math.floor(mins/60), m = mins%60;
+    const fmt = d => d.toLocaleString('en-PK',{dateStyle:'medium',timeStyle:'short'});
+    bHtml += `
+      <div class="breakdown-item" style="animation-delay:${idx*0.06}s">
+        <span class="bl">Entry ${idx+1}: ${fmt(s)} — ${fmt(e)}</span>
+        <span class="bv">${h}h ${m}m</span>
+      </div>`;
+  });
+
+  if (hasErr) return;
+
+  const totalH = Math.floor(totalMins/60);
+  const totalM = totalMins % 60;
+  const dec    = (totalMins/60).toFixed(2);
+
+  const box = document.getElementById('timeResult');
+  box.innerHTML = `
+    <div class="time-hero">
+      <div class="big-num">${totalH}h ${totalM}m</div>
+      <div class="sub">Total Elapsed Time &nbsp;|&nbsp; <strong>${dec} hrs</strong> decimal</div>
+    </div>
+    <div class="breakdown-list">${bHtml}</div>`;
+  box.classList.remove('visible');
+  void box.offsetWidth;
+  box.classList.add('visible');
+  box.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+// Default first entry
+addTimeEntry();
+</script>
 </body>
 </html>
